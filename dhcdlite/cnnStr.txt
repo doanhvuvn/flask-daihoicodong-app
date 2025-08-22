@@ -1,1 +1,0 @@
-Data Source=180.148.4.140,16923;Initial Catalog=daihoicodong;User ID=sa;password=d@5th@3o;timeout=500000
