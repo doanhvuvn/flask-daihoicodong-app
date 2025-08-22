@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tra cứu thông tin cổ đông</title>
+    <link href="https://fonts.cdnfonts.com/css/idautomationhc39m" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .lookup-form {
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input[type="text"] {
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 10px;
+            width: 95%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #shareholder-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: left;
+        }
+
+        #shareholder-info p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        #shareholder-info .label {
+            font-weight: bold;
+        }
+
+        #barcode-display {
+            font-family: 'IDAutomationHC39M', sans-serif;
+            font-size: 36px;
+            display: block;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        #register-button {
+            width: 100%;
+            font-size: 18px;
+            padding: 12px 20px;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #register-button:hover {
+            background-color: #218838;
+
+            #reprint-button {
+                width: 100%;
+                font-size: 18px;
+                padding: 12px 20px;
+                margin-top: 20px;
+                background-color: #6c757d;
+                /* Màu xám trung tính */
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            #reprint-button:hover {
+                background-color: #5a6268;
+            }
+
+            /* Màu xám đậm hơn khi di chuột */
+        }
+
+        #reprint-button {
+            width: 100%;
+            font-size: 18px;
+            padding: 12px 20px;
+            margin-top: 20px;
+            background-color: #6c757d;
+            /* Màu xám trung tính */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #reprint-button:hover {
+            background-color: #5a6268;
+        }
+
+        /* Màu xám đậm hơn khi di chuột */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="lookup-form">
+            <h1>Tra cứu thông tin cổ đông</h1>
+            <label for="ma_co_dong_input">Vui lòng nhập Mã Cổ Đông:</label><br>
+            <input type="text" id="ma_co_dong_input" placeholder="Ví dụ: 16047" autofocus>
+        </div>
+        <div id="shareholder-info" style="display:none;">
+            <p><span class="label">Họ và tên:</span> <span id="info-ho-ten"></span></p>
+            <p class="label">Mã cổ đông:</p>
+            <span id="barcode-display"></span>
+            <p><span class="label">Số CMND/GCNĐKDN:</span> <span id="info-cmnd"></span></p>
+            <p><span class="label">Ngày cấp:</span> <span id="info-ngay-cap"></span></p>
+            <p><span class="label">Số lượng cổ phần:</span> <span id="info-so-luong-cp"></span></p>
+
+            <button id="register-button" style="display:none;">Đăng ký và In phiếu</button>
+
+            <button id="reprint-button" style="display:none;">In lại phiếu</button>
+        </div>
+    </div>
+
+    <script>
+        const inputField = document.getElementById('ma_co_dong_input');
+        const infoContainer = document.getElementById('shareholder-info');
+        const registerButton = document.getElementById('register-button');
+        const reprintButton = document.getElementById('reprint-button'); // Thêm nút In lại
+        let debounceTimeout;
+
+        // --- HÀM TÁI SỬ DỤNG ĐỂ IN PHIẾU ---
+        function printSlip(maCD) {
+            fetch(`/phieu-dang-ky/${maCD}`)
+                .then(response => response.text())
+                .then(htmlToPrint => {
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+
+                    iframe.onload = function () {
+                        const iframeWindow = iframe.contentWindow;
+                        iframeWindow.onafterprint = function () {
+                            document.body.removeChild(iframe);
+                            inputField.value = '';
+                            infoContainer.style.display = 'none';
+                            inputField.focus();
+                        };
+                        iframeWindow.focus();
+                        iframeWindow.print();
+                    };
+
+                    iframe.contentDocument.open();
+                    iframe.contentDocument.write(htmlToPrint);
+                    iframe.contentDocument.close();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu in:', error);
+                    alert('Không thể lấy dữ liệu để in.');
+                });
+        }
+
+        // --- XỬ LÝ TRA CỨU KHI GÕ ---
+        inputField.addEventListener('input', function () {
+            clearTimeout(debounceTimeout);
+            const maCD = this.value;
+
+            if (!maCD) {
+                infoContainer.style.display = 'none';
+                return;
+            }
+
+            debounceTimeout = setTimeout(() => {
+                fetch(`/api/shareholder/${maCD}`)
+                    .then(response => {
+                        if (!response.ok) { throw new Error('Not found'); }
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById('info-ho-ten').textContent = data.ho_ten;
+                        document.getElementById('barcode-display').textContent = `*${String(data.ma_co_dong).padStart(11, '0')}*`;
+                        document.getElementById('info-cmnd').textContent = data.cmnd;
+                        document.getElementById('info-ngay-cap').textContent = data.ngay_cap;
+                        document.getElementById('info-so-luong-cp').textContent = data.so_luong_cp;
+
+                        // --- CẬP NHẬT LOGIC ẨN/HIỆN NÚT ---
+                        if (data.da_dang_ky) {
+                            registerButton.style.display = 'none';
+                            reprintButton.style.display = 'block'; // Hiện nút In lại
+                        } else {
+                            registerButton.style.display = 'block'; // Hiện nút Đăng ký
+                            reprintButton.style.display = 'none';
+                        }
+                        // ------------------------------------
+
+                        infoContainer.style.display = 'block';
+                    })
+                    .catch(error => {
+                        infoContainer.style.display = 'none';
+                    });
+            }, 300);
+        });
+
+        // --- SỰ KIỆN CHO NÚT ĐĂNG KÝ ---
+        registerButton.addEventListener('click', function () {
+            const maCD = inputField.value;
+            if (!maCD) { return; }
+
+            fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ma_co_dong: maCD }),
+            })
+                .then(response => response.json().then(data => ({ ok: response.ok, data: data })))
+                .then(result => {
+                    if (result.ok) {
+                        // Gọi hàm in chung
+                        printSlip(maCD);
+                    } else {
+                        throw new Error(result.data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Thất bại: ' + error.message);
+                });
+        });
+
+        // --- SỰ KIỆN MỚI CHO NÚT IN LẠI ---
+        reprintButton.addEventListener('click', function () {
+            const maCD = inputField.value;
+            if (maCD) {
+                // Chỉ cần gọi hàm in, không cần đăng ký
+                printSlip(maCD);
+            }
+        });
+    </script>
+</body>
+
+</html>
