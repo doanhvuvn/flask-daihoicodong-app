@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thẻ Biểu Quyết</title>
+    <link href="https://fonts.cdnfonts.com/css/idautomationhc39m" rel="stylesheet">
+    <style>
+        /* CSS cho hiển thị trên màn hình */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            padding: 2cm;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            border: 2px solid #000;
+            padding: 30px;
+            background-color: #fff;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .company-info h2,
+        .company-info h3,
+        .company-info p {
+            margin: 5px 0;
+        }
+
+        .main-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .main-title h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .voting-id {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 4px;
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #999;
+        }
+
+        .shareholder-info {
+            margin-top: 25px;
+            font-size: 18px;
+        }
+
+        .shareholder-info p {
+            margin: 12px 0;
+        }
+
+        .shareholder-info .label {
+            font-weight: bold;
+        }
+
+        .barcode {
+            font-family: 'IDAutomationHC39M', sans-serif;
+            /* THAY ĐỔI 1: Thu nhỏ kích thước font mã vạch */
+            font-size: 30px;
+        }
+
+        .signature-section {
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .signature-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .signature-note {
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* --- CSS MỚI ĐỂ TỐI ƯU HÓA VIỆC IN --- */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* Thiết lập khổ giấy và lề */
+            @page {
+                size: A4;
+                margin: 2cm;
+                /* Lề 2cm cho tất cả các cạnh */
+            }
+
+            .container {
+                border: 2px solid #000;
+                /* Giữ lại đường viền khi in */
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 20px;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
+            <div class="company-info">
+                <h2>CÔNG TY CỔ PHẦN PHÁT TRIỂN HẠ TẦNG KỸ THUẬT</h2>
+                <h3>ĐẠI HỘI ĐỒNG CỔ ĐÔNG THƯỜỜNG NIÊN NĂM 2025</h3>
+                <p>Ngày 09 tháng 04 năm 2025</p>
+            </div>
+        </div>
+
+        <div class="main-title">
+            <h1>THẺ BIỂU QUYẾT</h1>
+        </div>
+
+        <p class="voting-id">IJC{{ ma_co_dong.zfill(6) }}</p>
+
+        <div class="shareholder-info">
+            <p><span class="label">Cổ đông:</span> {{ ho_ten }}</p>
+            <p><span class="label">Số cổ phần sở hữu:</span> {{ so_luong_cp }}</p>
+
+            <!-- THAY ĐỔI 2: Tách tiêu đề và mã vạch ra riêng để căn giữa -->
+            <p class="label" style="margin-bottom: 5px;">Mã cổ đông:</p>
+            <div style="text-align: center;">
+                <span class="barcode">*{{ ma_co_dong.zfill(11) }}*</span>
+            </div>
+        </div>
+
+        <div class="signature-section">
+            <p class="signature-title">Cổ đông/Người được ủy quyền</p>
+            <p class="signature-note">(Ký và ghi rõ họ tên)</p>
+        </div>
+    </div>
+</body>
+
+</html>

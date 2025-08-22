@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu Biểu Quyết</title>
+    <link href="https://fonts.cdnfonts.com/css/idautomationhc39m" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .logo {
+            max-height: 60px;
+            margin-right: 20px;
+        }
+
+        .header-text {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .header-text h2 {
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .header-text h3 {
+            font-size: 12pt;
+            margin: 3px 0;
+        }
+
+        .header-text p {
+            font-size: 11pt;
+            margin: 3px 0;
+        }
+
+        .main-title {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .main-title h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .main-title p {
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .shareholder-info p {
+            margin: 6px 0;
+        }
+
+        .shareholder-info .label {
+            font-weight: bold;
+        }
+
+        .info-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .barcode {
+            font-family: 'IDAutomationHC39M', sans-serif;
+            font-size: 14px;
+        }
+
+        .voting-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 10pt;
+        }
+
+        .voting-table th,
+        .voting-table td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .voting-table th {
+            text-align: center;
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+
+        .voting-table td:first-child {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .voting-table .option-col {
+            width: 90px;
+            text-align: center;
+        }
+
+        /* THAY ĐỔI 1: Thêm CSS để ngăn lặp lại tiêu đề khi in */
+        .voting-table thead {
+            display: table-row-group;
+        }
+
+        .notes {
+            margin-top: 15px;
+            font-size: 9pt;
+            font-style: italic;
+        }
+
+        .signature-section {
+            text-align: center;
+            margin-top: 30px;
+            float: right;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
+            <div class="header-text">
+                <h2>ĐẠI HỘI ĐỒNG CỔ ĐÔNG THƯỜNG NIÊN NĂM 2025</h2>
+                <h3>CÔNG TY CỔ PHẦN PHÁT TRIỂN HẠ TẦNG KỸ THUẬT</h3>
+                <p>Ngày 09 tháng 04 năm 2025</p>
+            </div>
+        </div>
+
+        <div class="main-title">
+            <h1>PHIẾU BIỂU QUYẾT</h1>
+            <p>(Các nội dung trong báo cáo, tờ trình tại đại hội)</p>
+        </div>
+
+        <div class="shareholder-info">
+            <div class="info-line">
+                <span class="label">Mã cổ đông:</span>
+                <span class="barcode">*{{ ma_co_dong.zfill(11) }}*</span>
+            </div>
+            <p><span class="label">Họ và tên Cổ đông:</span> {{ ho_ten }}</p>
+            <p><span class="label">Địa chỉ:</span> {{ diachi }}</p>
+            <p><span class="label">Tổng số cổ phần sở hữu/ủy quyền đại diện:</span> {{ so_luong_cp }}</p>
+        </div>
+
+        <p>Sau khi nghiên cứu các tờ trình của HĐQT được trình bày tại Đại hội, tôi có ý kiến biểu quyết các vấn đề như
+            sau:</p>
+
+        <table class="voting-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">STT</th>
+                    <th>Nội dung biểu quyết</th>
+                    <th class="option-col">Tán thành</th>
+                    <th class="option-col">Không tán thành</th>
+                    <th class="option-col">Không có ý kiến</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>01</td>
+                    <td>
+                        <strong>Tờ trình số: 01/TTr-HĐQT</strong><br>
+                        Thông qua Báo cáo tài chính năm 2024 đã kiểm toán, Báo cáo của Hội đồng quản trị năm 2024, Báo
+                        cáo của Ban kiểm soát năm 2024
+                    </td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                </tr>
+                <tr>
+                    <td>02</td>
+                    <td>
+                        <strong>Tờ trình số: 02/TTr-HĐQT</strong><br>
+                        Thông qua Báo cáo của Tổng giám đốc về kết quả kinh doanh năm 2024 và kế hoạch kinh doanh năm
+                        2025
+                    </td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                </tr>
+                <tr>
+                    <td>03</td>
+                    <td>
+                        <strong>Tờ trình số: 03/TTr-HĐQT</strong><br>
+                        Thông qua Phương án phân phối lợi nhuận và chi trả cổ tức năm 2024, Kế hoạch phân phối lợi nhuận
+                        và chi trả cổ tức năm 2025
+                    </td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                </tr>
+                <tr>
+                    <td>04</td>
+                    <td>
+                        <strong>Tờ trình số: 04/TTr-HĐQT</strong><br>
+                        Thông qua việc chi trả thù lao HĐQT, BKS và Thư ký Công ty năm 2024 và Kế hoạch chi trả năm 2025
+                    </td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                </tr>
+                <tr>
+                    <td>05</td>
+                    <td>
+                        <strong>Tờ trình số: 05/TTr-HĐQT</strong><br>
+                        Thông qua Phương án chào bán thêm cổ phiếu cho cổ đông hiện hữu
+                    </td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                </tr>
+                <tr>
+                    <td>06</td>
+                    <td>
+                        <strong>Tờ trình số: 01/TTr-BKS</strong><br>
+                        Thông qua việc phê duyệt danh sách Công ty kiểm toán độc lập để kiểm toán báo cáo tài chính và
+                        kiểm toán hoạt động (nếu cần) của Công ty CP Phát triển Hạ tầng Kỹ thuật năm 2025
+                    </td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                    <td class="option-col">☐</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="notes">
+            <p><strong>Ghi chú:</strong></p>
+            <ul>
+                <li>Quý cổ đông hoặc người được ủy quyền của cổ đông vui lòng đánh dấu (X) vào phần ý kiến biểu quyết và
+                    nộp lại phiếu biểu quyết cho Ban tổ chức trước khi kết thúc đại hội.</li>
+                <li>Phiếu biểu quyết này chỉ có giá trị tại phiên họp ĐHĐCĐ thường niên năm 2025 được tổ chức ngày
+                    09/04/2025.</li>
+                <li>Các phiếu sau đây được xem là không hợp lệ: Phiếu không do Công ty phát hành (không theo mẫu, không
+                    có dấu của Công ty); Phiếu tẩy xóa hoặc ghi thêm nội dung khác.</li>
+            </ul>
+        </div>
+
+        <div class="signature-section">
+            <p><strong>CỔ ĐÔNG/NGƯỜI ĐƯỢC ỦY QUYỀN</strong></p>
+            <p>(Ký và ghi rõ họ tên)</p>
+        </div>
+    </div>
+</body>
+
+</html>

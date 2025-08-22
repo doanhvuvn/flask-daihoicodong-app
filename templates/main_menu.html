@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý đăng ký tham dự Đại hội Cổ đông</title>
+    <style>
+        /* CSS cho trang menu chính */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            /* Nền màu xanh lam nhạt */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background-color: #00796b;
+            /* Màu xanh đậm hơn */
+            color: white;
+            display: flex;
+            align-items: center;
+            border-bottom: 4px solid #004d40;
+        }
+
+        .logo {
+            max-height: 50px;
+            margin-right: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .menu-item {
+            background-color: #f7f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item .icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+
+        .menu-item h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #004d40;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
+            <h1>Hệ thống Quản lý đăng ký tham dự Đại hội Cổ đông</h1>
+        </header>
+
+        <main class="menu-grid">
+            <!-- Menu 1: Đăng ký cổ đông -->
+            <a href="/dang-ky" class="menu-item">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#00796b">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="17" y1="11" x2="23" y2="11"></line>
+                </svg>
+                <h2>Đăng ký Cổ đông</h2>
+            </a>
+
+            <!-- Menu 2: Báo cáo -->
+            <a href="/bao-cao" class="menu-item">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#00796b">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <h2>Báo cáo Tư cách Cổ đông</h2>
+            </a>
+
+            <!-- Menu 3: Tình trạng -->
+            <a href="/tinh-trang" class="menu-item">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#00796b">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                    <path d="M22 19l-4.5-4.5"></path>
+                    <circle cx="15.5" cy="12.5" r="2.5"></circle>
+                </svg>
+                <h2>Tình trạng Đăng ký</h2>
+            </a>
+        </main>
+    </div>
+</body>
+
+</html>

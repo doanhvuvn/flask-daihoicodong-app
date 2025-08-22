@@ -66,59 +66,32 @@
             margin: 10px 0;
         }
 
-        #register-button {
+        .action-button {
             width: 100%;
             font-size: 18px;
             padding: 12px 20px;
             margin-top: 20px;
-            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+        }
+
+        #register-button {
+            background-color: #28a745;
         }
 
         #register-button:hover {
             background-color: #218838;
-
-            #reprint-button {
-                width: 100%;
-                font-size: 18px;
-                padding: 12px 20px;
-                margin-top: 20px;
-                background-color: #6c757d;
-                /* Màu xám trung tính */
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-            #reprint-button:hover {
-                background-color: #5a6268;
-            }
-
-            /* Màu xám đậm hơn khi di chuột */
         }
 
         #reprint-button {
-            width: 100%;
-            font-size: 18px;
-            padding: 12px 20px;
-            margin-top: 20px;
-            background-color: #6c757d;
-            /* Màu xám trung tính */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            background-color: #007bff;
         }
 
         #reprint-button:hover {
-            background-color: #5a6268;
+            background-color: #0069d9;
         }
-
-        /* Màu xám đậm hơn khi di chuột */
     </style>
 </head>
 
@@ -137,9 +110,8 @@
             <p><span class="label">Ngày cấp:</span> <span id="info-ngay-cap"></span></p>
             <p><span class="label">Số lượng cổ phần:</span> <span id="info-so-luong-cp"></span></p>
 
-            <button id="register-button" style="display:none;">Đăng ký và In phiếu</button>
-
-            <button id="reprint-button" style="display:none;">In lại phiếu</button>
+            <button id="register-button" class="action-button" style="display:none;">Đăng ký và In (3 phiếu)</button>
+            <button id="reprint-button" class="action-button" style="display:none;">In lại (3 phiếu)</button>
         </div>
     </div>
 
@@ -147,13 +119,18 @@
         const inputField = document.getElementById('ma_co_dong_input');
         const infoContainer = document.getElementById('shareholder-info');
         const registerButton = document.getElementById('register-button');
-        const reprintButton = document.getElementById('reprint-button'); // Thêm nút In lại
+        const reprintButton = document.getElementById('reprint-button');
         let debounceTimeout;
 
-        // --- HÀM TÁI SỬ DỤNG ĐỂ IN PHIẾU ---
-        function printSlip(maCD) {
-            fetch(`/phieu-dang-ky/${maCD}`)
-                .then(response => response.text())
+        // --- HÀM IN MỘT PHIẾU DUY NHẤT VÀ GỌI HÀM TIẾP THEO ---
+        function printSingleSlip(url, callback) {
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Không thể tải tài liệu từ ${url} (lỗi ${response.status})`);
+                    }
+                    return response.text();
+                })
                 .then(htmlToPrint => {
                     const iframe = document.createElement('iframe');
                     iframe.style.display = 'none';
@@ -163,9 +140,9 @@
                         const iframeWindow = iframe.contentWindow;
                         iframeWindow.onafterprint = function () {
                             document.body.removeChild(iframe);
-                            inputField.value = '';
-                            infoContainer.style.display = 'none';
-                            inputField.focus();
+                            if (callback) {
+                                callback(); // Gọi hàm tiếp theo (nếu có) sau khi in xong
+                            }
                         };
                         iframeWindow.focus();
                         iframeWindow.print();
@@ -176,15 +153,22 @@
                     iframe.contentDocument.close();
                 })
                 .catch(error => {
-                    console.error('Lỗi khi lấy dữ liệu in:', error);
-                    alert('Không thể lấy dữ liệu để in.');
+                    console.error('Lỗi khi in:', error);
+                    alert('Lỗi in: ' + error.message);
                 });
+        }
+
+        // --- HÀM RESET FORM ---
+        function resetForm() {
+            inputField.value = '';
+            infoContainer.style.display = 'none';
+            inputField.focus();
         }
 
         // --- XỬ LÝ TRA CỨU KHI GÕ ---
         inputField.addEventListener('input', function () {
             clearTimeout(debounceTimeout);
-            const maCD = this.value;
+            const maCD = this.value.trim();
 
             if (!maCD) {
                 infoContainer.style.display = 'none';
@@ -204,16 +188,13 @@
                         document.getElementById('info-ngay-cap').textContent = data.ngay_cap;
                         document.getElementById('info-so-luong-cp').textContent = data.so_luong_cp;
 
-                        // --- CẬP NHẬT LOGIC ẨN/HIỆN NÚT ---
                         if (data.da_dang_ky) {
                             registerButton.style.display = 'none';
-                            reprintButton.style.display = 'block'; // Hiện nút In lại
+                            reprintButton.style.display = 'block';
                         } else {
-                            registerButton.style.display = 'block'; // Hiện nút Đăng ký
+                            registerButton.style.display = 'block';
                             reprintButton.style.display = 'none';
                         }
-                        // ------------------------------------
-
                         infoContainer.style.display = 'block';
                     })
                     .catch(error => {
@@ -222,9 +203,19 @@
             }, 300);
         });
 
+        // --- HÀM BẮT ĐẦU CHUỖI IN TUẦN TỰ ---
+        function startSequentialPrint(maCD) {
+            // In phiếu 1, sau đó in phiếu 2, rồi phiếu 3, cuối cùng reset form
+            printSingleSlip(`/phieu-dang-ky/${maCD}`, () => {
+                printSingleSlip(`/the-bieu-quyet/${maCD}`, () => {
+                    printSingleSlip(`/phieu-bieu-quyet/${maCD}`, resetForm);
+                });
+            });
+        }
+
         // --- SỰ KIỆN CHO NÚT ĐĂNG KÝ ---
         registerButton.addEventListener('click', function () {
-            const maCD = inputField.value;
+            const maCD = inputField.value.trim();
             if (!maCD) { return; }
 
             fetch('/register', {
@@ -235,8 +226,7 @@
                 .then(response => response.json().then(data => ({ ok: response.ok, data: data })))
                 .then(result => {
                     if (result.ok) {
-                        // Gọi hàm in chung
-                        printSlip(maCD);
+                        startSequentialPrint(maCD); // Bắt đầu chuỗi in
                     } else {
                         throw new Error(result.data.message);
                     }
@@ -246,12 +236,11 @@
                 });
         });
 
-        // --- SỰ KIỆN MỚI CHO NÚT IN LẠI ---
+        // --- SỰ KIỆN CHO NÚT IN LẠI ---
         reprintButton.addEventListener('click', function () {
-            const maCD = inputField.value;
+            const maCD = inputField.value.trim();
             if (maCD) {
-                // Chỉ cần gọi hàm in, không cần đăng ký
-                printSlip(maCD);
+                startSequentialPrint(maCD); // Bắt đầu chuỗi in
             }
         });
     </script>
