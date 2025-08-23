@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận tham dự Đại hội</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background-color: #00796b;
+            color: white;
+            display: flex;
+            align-items: center;
+            border-bottom: 4px solid #004d40;
+        }
+
+        .logo {
+            max-height: 50px;
+            margin-right: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content-area {
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .content-area h2 {
+            color: #333;
+        }
+
+        .info-display {
+            text-align: left;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .info-display p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .info-display .label {
+            font-weight: bold;
+        }
+
+        .action-button {
+            width: 100%;
+            font-size: 18px;
+            padding: 12px 20px;
+            margin-top: 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #28a745;
+        }
+
+        .action-button:hover {
+            background-color: #218838;
+        }
+
+        .confirmation-message {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
+            <h1>Hệ thống Quản lý Đại hội Cổ đông</h1>
+        </header>
+        <main class="content-area">
+            <h2>Xác nhận tham dự Đại hội</h2>
+
+            <div class="info-display">
+                <p><span class="label">Cổ đông:</span> {{ ho_ten }}</p>
+                <p><span class="label">Địa chỉ:</span> {{ diachi }}</p>
+                <p><span class="label">Số lượng cổ phần:</span> {{ so_luong_cp }}</p>
+            </div>
+
+            <div id="action-area">
+                {% if da_xac_nhan %}
+                <p class="confirmation-message">Cổ đông đã xác nhận tham gia đại hội.</p>
+                {% else %}
+                <button id="confirm-button" class="action-button">Xác nhận tham gia</button>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const confirmButton = document.getElementById('confirm-button');
+        if (confirmButton) {
+            confirmButton.addEventListener('click', function () {
+                const maCD = "{{ ma_co_dong }}";
+                fetch('/api/confirm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ma_co_dong: maCD }),
+                })
+                    .then(response => response.json().then(data => ({ ok: response.ok, data: data })))
+                    .then(result => {
+                        const actionArea = document.getElementById('action-area');
+                        if (result.ok) {
+                            actionArea.innerHTML = '<p class="confirmation-message">Cám ơn cổ đông đã xác nhận tham gia đại hội.</p>';
+                        } else {
+                            actionArea.innerHTML = `<p class="confirmation-message" style="color: red;">Lỗi: ${result.data.message}</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                        alert('Đã xảy ra lỗi kết nối. Vui lòng thử lại.');
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>

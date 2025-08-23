@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả Biểu quyết</title>
+    <style>
+        /* Reset và Style cơ bản */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Khung chứa chính */
+        .dashboard-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            /* Căn giữa */
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 30px;
+            background-color: #00796b;
+            color: white;
+            display: flex;
+            align-items: center;
+            border-bottom: 4px solid #004d40;
+        }
+
+        .logo {
+            max-height: 50px;
+            margin-right: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Khu vực nội dung */
+        .content-area {
+            padding: 30px 40px;
+        }
+
+        .content-area h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        /* Khung kết quả */
+        .result-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fdfdfd;
+        }
+
+        .result-item h3 {
+            margin-top: 0;
+            color: #004d40;
+            font-size: 18px;
+        }
+
+        .result-item p {
+            margin-top: 5px;
+            font-style: italic;
+            color: #555;
+        }
+
+        /* Thanh tiến trình */
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            background-color: #e9ecef;
+            border-radius: 4px;
+            height: 20px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .progress-bar>div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: width 0.6s ease;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+        }
+
+        .bg-secondary {
+            background-color: #6c757d;
+        }
+
+        /* Nút Quay lại */
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
+            <h1>Hệ thống Quản lý Đại hội Cổ đông</h1>
+        </header>
+        <main class="content-area">
+            <h2>Kết quả Biểu quyết</h2>
+
+            {% for result in results %}
+            <div class="result-item">
+                <h3>{{ result.totrinh }}</h3>
+                <p>{{ result.noidung }}</p>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Đồng ý</span>
+                        <span>{{ "%.2f"|format(result.agree_percent) }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="bg-success" style="width: {{ result.agree_percent }}%"></div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Phản đối</span>
+                        <span>{{ "%.2f"|format(result.disagree_percent) }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="bg-danger" style="width: {{ result.disagree_percent }}%"></div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Không có ý kiến</span>
+                        <span>{{ "%.2f"|format(result.no_opinion_percent) }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="bg-secondary" style="width: {{ result.no_opinion_percent }}%"></div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p style="text-align: center;">Chưa có dữ liệu biểu quyết để thống kê.</p>
+            {% endfor %}
+
+            <div class="back-button-container">
+                <a href="/" class="back-button">Quay lại Menu chính</a>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

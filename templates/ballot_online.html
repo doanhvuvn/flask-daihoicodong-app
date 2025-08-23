@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Biểu Quyết Trực Tuyến</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background-color: #00796b;
+            color: white;
+            display: flex;
+            align-items: center;
+            border-bottom: 4px solid #004d40;
+        }
+
+        .logo {
+            max-height: 50px;
+            margin-right: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content-area {
+            padding: 30px 40px;
+        }
+
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        .info-box .label {
+            font-weight: bold;
+        }
+
+        .ballot-item {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .ballot-item h3 {
+            margin-top: 0;
+            color: #004d40;
+        }
+
+        .ballot-item p {
+            margin-top: 5px;
+        }
+
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        .actions {
+            margin-top: 15px;
+        }
+
+        .view-content-btn {
+            background: none;
+            border: 1px solid #007bff;
+            color: #007bff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            font-size: 18px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .final-message {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+            padding: 40px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #confirm-yes {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #confirm-no {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
+            <h1>Phiếu Biểu Quyết Trực Tuyến</h1>
+        </header>
+        <main class="content-area">
+            <div class="info-box">
+                <p><span class="label">Mã cổ đông:</span> {{ shareholder_info.ma_co_dong }}</p>
+                <p><span class="label">Cổ đông:</span> {{ shareholder_info.ho_ten }}</p>
+                <p><span class="label">Địa chỉ:</span> {{ shareholder_info.diachi }}</p>
+                <p><span class="label">Số cổ phần:</span> {{ shareholder_info.so_luong_cp }}</p>
+            </div>
+
+            {% if has_voted %}
+            <p class="final-message">Cổ đông đã biểu quyết.</p>
+            {% else %}
+            <form id="ballot-form">
+                {% for item in ballot_content %}
+                <div class="ballot-item">
+                    <h3>{{ item.totrinh }}</h3>
+                    <p>{{ item.noidung }}</p>
+                    <div class="options">
+                        <label><input type="radio" name="vote_{{ item.id }}" value="1" checked> Đồng ý</label>
+                        <label><input type="radio" name="vote_{{ item.id }}" value="2"> Phản đối</label>
+                        <label><input type="radio" name="vote_{{ item.id }}" value="3"> Không có ý kiến</label>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="view-content-btn">Xem nội dung tờ trình</button>
+                    </div>
+                </div>
+                {% endfor %}
+                <button type="submit" class="submit-btn">Biểu quyết</button>
+            </form>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <p>Bạn chắc chắn gửi nội dung biểu quyết? Một khi gửi sẽ không thể chỉnh sửa!</p>
+            <div class="modal-buttons">
+                <button id="confirm-no">Xem lại</button>
+                <button id="confirm-yes">Chắc chắn</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('ballot-form');
+        const modal = document.getElementById('confirmation-modal');
+        const confirmYesBtn = document.getElementById('confirm-yes');
+        const confirmNoBtn = document.getElementById('confirm-no');
+
+        if (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Ngăn form gửi đi theo cách truyền thống
+                modal.style.display = 'block'; // Hiển thị modal
+            });
+        }
+
+        if (confirmNoBtn) {
+            confirmNoBtn.addEventListener('click', function () {
+                modal.style.display = 'none'; // Ẩn modal
+            });
+        }
+
+        if (confirmYesBtn) {
+            confirmYesBtn.addEventListener('click', function () {
+                modal.style.display = 'none'; // Ẩn modal
+
+                const formData = new FormData(form);
+                const votes = [];
+                // Lặp qua ballot_content để lấy đúng các lựa chọn
+                const ballotContent = {{ ballot_content| tojson
+            }};
+
+        ballotContent.forEach(item => {
+            const voteValue = formData.get(`vote_${item.id}`);
+            votes.push({
+                id: item.id,
+                bieuquyet: parseInt(voteValue, 10)
+            });
+        });
+
+        const submissionData = {
+            ma_co_dong: "{{ shareholder_info.ma_co_dong }}",
+            so_co_phan: "{{ shareholder_info.so_luong_cp }}",
+            votes: votes
+        };
+
+        fetch('/api/submit-ballot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(submissionData)
+        })
+            .then(response => response.json().then(data => ({ ok: response.ok, data: data })))
+            .then(result => {
+                const contentArea = document.querySelector('.content-area');
+                if (result.ok) {
+                    contentArea.innerHTML = '<p class="final-message">Bạn đã biểu quyết thành công!</p>';
+                } else {
+                    alert('Lỗi: ' + result.data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert('Đã xảy ra lỗi kết nối.');
+            });
+            });
+        }
+
+        // Đóng modal nếu click ra ngoài
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>

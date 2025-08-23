@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Quản lý đăng ký tham dự Đại hội Cổ đông</title>
+    <title>Hệ thống Quản lý Đại hội Cổ đông</title>
     <style>
         /* CSS cho trang menu chính */
         body {
@@ -89,7 +89,7 @@
     <div class="dashboard-container">
         <header class="header">
             <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Becamex IJC Logo" class="logo">
-            <h1>Hệ thống Quản lý đăng ký tham dự Đại hội Cổ đông</h1>
+            <h1>Hệ thống Quản lý Đại hội Cổ đông</h1>
         </header>
 
         <main class="menu-grid">
@@ -125,6 +125,14 @@
                     <circle cx="15.5" cy="12.5" r="2.5"></circle>
                 </svg>
                 <h2>Tình trạng Đăng ký</h2>
+            </a>
+
+            <!-- NÚT MỚI: KẾT QUẢ BIỂU QUYẾT -->
+            <a href="/ket-qua-bieu-quyet" class="menu-item">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#00796b">
+                    <path d="M18 20V10M12 20V4M6 20V14"></path>
+                </svg>
+                <h2>Kết quả Biểu quyết</h2>
             </a>
         </main>
     </div>
